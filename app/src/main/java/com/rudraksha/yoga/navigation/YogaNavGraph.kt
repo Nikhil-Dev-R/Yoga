@@ -1,32 +1,66 @@
-package com.rudraksha.yoga.ui.navigation
+package com.rudraksha.yoga.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.rudraksha.yoga.data.model.UserProfile
-import com.rudraksha.yoga.data.model.enums.Gender
-import com.rudraksha.yoga.data.model.enums.Goal
-import com.rudraksha.yoga.data.model.enums.PhysicalLevel
-import com.rudraksha.yoga.ui.*
-import com.rudraksha.yoga.ui.screens.RoleSelectionScreen
+import com.rudraksha.yoga.ui.AddUserScreen
+import com.rudraksha.yoga.ui.RoleSelectionScreen
+import com.rudraksha.yoga.ui.screens.FeedbackScreen
+import com.rudraksha.yoga.ui.screens.OnboardingScreen
 import com.rudraksha.yoga.ui.screens.SarpanchDashboard
-import com.rudraksha.yoga.ui.screens.YogaSuggestionScreen
+import com.rudraksha.yoga.ui.screens.SettingsScreen
+import com.rudraksha.yoga.ui.screens.SplashScreen
 
 @Composable
-fun YogaNavGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "role_selection") {
-        composable("role_selection") {
+fun YogaNavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Route.Splash
+    ) {
+        composable(Route.Splash) {
+            SplashScreen { navController.navigate(Route.Onboarding) }
+        }
+        composable(Route.Onboarding) {
+            OnboardingScreen { navController.navigate(Route.RoleSelection) }
+        }
+        composable(Route.RoleSelection) {
             RoleSelectionScreen { role ->
-                if (role == "Sarpanch") navController.navigate("dashboard")
-                else navController.navigate("suggestion")
+                if (role == "Sarpanch") navController.navigate(Route.SarpanchDashboard)
+                else navController.navigate(Route.YogaSuggestion)
             }
         }
-        composable("dashboard") {
-            SarpanchDashboard(profiles = listOf(), onAddUser = {}, onUserClick = {})
+        composable(Route.SarpanchDashboard) {
+            SarpanchDashboard(
+                profiles = listOf(), // Replace with real data source
+                onAddUser = { navController.navigate(Route.AddUser) },
+                onUserClick = { navController.navigate(Route.EditUser) }
+            )
         }
-        composable("suggestion") {
-            YogaSuggestionScreen(user = UserProfile(0, "Demo", 30, Gender.MALE, "", PhysicalLevel.LOW, Goal.GENERAL_FITNESS), poses = listOf(), onPoseClick = {})
+        composable(Route.AddUser) {
+            AddUserScreen { navController.popBackStack() }
+        }
+        composable(Route.EditUser) {
+            // Replace with actual user object
+            // EditUserScreen(existing = DummyData.sampleUser) { navController.popBackStack() }
+        }
+        composable(Route.YogaSuggestion) {
+            // YogaSuggestionScreen(poses = DummyData.sampleYogaPoses) {
+            //     navController.navigate(Route.YogaDetail)
+            // }
+        }
+        composable(Route.YogaDetail) {
+            // YogaDetailScreen(pose = DummyData.samplePose)
+        }
+        composable(Route.Feedback) {
+            FeedbackScreen { navController.popBackStack() }
+        }
+        composable(Route.Settings) {
+            SettingsScreen { navController.navigate(Route.RoleSelection) }
         }
     }
 }
